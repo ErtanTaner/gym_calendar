@@ -1,1 +1,10 @@
-Register
+{% extends 'base.html' %}
+{% block content %}
+<form id="register-form" method="POST">
+  <label for="username">username</label>
+  <input id="username" name="username" type="text" required />
+  <label for="password">password</label>
+  <input id="password" name="password" type="text" required />
+  <button>Register</button>
+</form>
+{% endblock %}
