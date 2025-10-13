@@ -39,7 +39,7 @@ def login():
             return redirect(url_for("calendar.index"))
     return render_template("auth/login.html")
 
-@bp.get("/logout/")
+@bp.post("/logout/")
 def logout():
     session_id = session.pop("session_id", None)
     if session_id is not None:
