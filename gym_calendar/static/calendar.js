@@ -1,7 +1,10 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  const res = window.location.href.includes("localhost") ? await fetch("http://localhost:5000/calendar/history") : await fetch(`${window.location.origin}/calendar/history/`, {method: "GET", credentials: "same-origin"});
+  const oldEvents = await res.json() || [];
   const calendarEl = document.querySelector("#calendar");
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "listWeek",
+    events: oldEvents,
     views: {
       listDay: { buttonText: 'list day' },
       listWeek: { buttonText: 'list week' },
@@ -25,12 +28,16 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault()
     formData = new FormData(form)
-    const content = await fetch("http://localhost:5000/calendar/bot", {
+    const url = window.location.href.includes("localhost") ? "http://localhost:5000/calendar/bot" : `${window.location.origin}/calendar/bot/`
+    const content = await fetch(url, {
       method: "POST",
-      body: formData
+      body: formData,
+      credentials: "same-origin"
     })
 
-    const ev = await content.json()
-    calendar.addEvent(ev)
+    const evs = await content.json();
+    evs.map(work => {
+      calendar.addEvent(work);
+    })
   })
 })

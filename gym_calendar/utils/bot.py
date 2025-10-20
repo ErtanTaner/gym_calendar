@@ -1,11 +1,16 @@
+import os
+import json
 from flask import g
 from ollama import ChatResponse, chat
+from openai import OpenAI
 
 class GymBot():
-    def __init__(self, model="deepseek-r1:14b"):
+    def __init__(self, model="deepseek-r1:14b", token=None):
         self.model = model
+        self.local = True if os.environ.get("LOCAL") == "true" else False
+        self.token = token
 
-    def chat_with_bot(self, msg):
+    def chat_with_bot(self, msg, history):
         pre_prompt = f"""
 You are a JSON-only fitness program generator. You MUST return ONLY a valid JSON array of event objects with no additional text, explanations, or formatting.
 
@@ -18,7 +23,6 @@ USER INPUT:
 OUTPUT: ONLY JSON array following EXACTLY this structure:
 [
   {{
-    "id": "workout-1",
     "groupId": "fitness-program",
     "title": "Workout Name<br/>-- Exercise 1: sets x reps<br/>-- Exercise 2: sets x reps<br/>Notes",
     "start": "YYYY-MM-DDTHH:MM:SS",
@@ -27,7 +31,6 @@ OUTPUT: ONLY JSON array following EXACTLY this structure:
     "backgroundColor": "#color",
     "borderColor": "#color",
     "textColor": "#FFFFFF",
-    "editable": true
   }}
 ]
 
@@ -44,6 +47,21 @@ IF YOU RETURN ANYTHING OTHER THAN PURE JSON, THE APPLICATION WILL FAIL.
 
 BEGIN OUTPUT:
 
-{msg}
 """
-        return chat(model=self.model, messages=[{"role": "user", "content":msg}])
+        if self.local == False:
+            base_message = [{"role": "system", "content": pre_prompt}]
+            messages = history + [{"role": "user", "content": msg}] if len(history) else [{"role": "user", "content": msg}] 
+            final = base_message + messages
+            client = OpenAI(api_key=self.token, base_url="https://api.deepseek.com")
+            res = client.chat.completions.create(
+                model=self.model,
+                messages=final,
+                stream=False
+            )
+            print(f"\n*********res.usage {res.usage}*********\n")
+            res_content = res.choices[0].message.content 
+            messages.append({"role": "assistant", "content": res_content})
+            return (res_content, messages)
+
+        else:
+            return chat(model=self.model, messages=[{"role": "user", "content":pre_prompt + msg}])["message"]["content"]
