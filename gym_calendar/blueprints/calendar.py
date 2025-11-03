@@ -29,7 +29,7 @@ def history():
         history_events = filter(lambda x: x["role"] == "assistant", parsed_program)
 
     merged = reduce(lambda x, y: json.loads(x["content"]) + json.loads(y["content"]), history_events)
-    return merged
+    return merged if isinstance(merged, list) else json.loads(merged["content"])
 
 @bp.post("/bot/")
 @check_request_auth
