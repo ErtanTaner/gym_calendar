@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from flask import Flask
+from flask import Flask, redirect, url_for
 from dotenv import load_dotenv
 from firebase_admin import initialize_app
 from gym_calendar.utils.firebase import init_firebase, get_auth
@@ -27,6 +27,10 @@ def create_app(test_config=None):
     @app.get("/healthcheck/")
     def healthcheck():
         return json.dumps({"status": "OK"})
+
+    @app.get("/")
+    def index():
+        return redirect(url_for("calendar.index"))
 
     init_firebase()
     from gym_calendar.blueprints import calendar, auth

@@ -2,7 +2,7 @@ import re
 import json
 import os
 from flask import (
-    Blueprint, render_template, redirect, url_for, request, g
+    Blueprint, render_template, url_for, request, g
 )
 from gym_calendar.blueprints.auth import check_request_auth
 from gym_calendar.utils.bot import GymBot
