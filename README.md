@@ -11,4 +11,4 @@ AI assisted gym calendar which creates workout programs with user input. Uses Fl
 4. Run both emulators and flask. 
 
 ## Tech Stack
-[![Tech stack](https://skillicons.dev/icons?i=js,html,css,flask,python,sqlite)](https://skillicons.dev)
+[![Tech stack](https://skillicons.dev/icons?i=js,html,css,flask,python,sqlite,firebase,docker)](https://skillicons.dev)
